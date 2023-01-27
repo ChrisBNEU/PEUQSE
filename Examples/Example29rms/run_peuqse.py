@@ -1,4 +1,4 @@
-# %%
+
 import numpy as np 
 import PEUQSE as PEUQSE
 import PEUQSE.UserInput as UserInput
@@ -6,18 +6,18 @@ import sys
 sys.path.insert(0, '../../')
 
 
-# %%
+
 # Just a simple example. The user can also put the values in directly into the runfile or extract from a csv, for example.
 # import observed_values_00
 import rmg_model  # function for peuquse to optimize
 import yaml
 
-# %%
+
 # load the experimental data yaml so we get a dict of lists for each parameter
 expt_data = rmg_model.repackage_yaml("./rms_model/small_expt.yaml")
 expt_data
 
-# %%
+
 # build the x-data array
 x_data = []
 x_data.append(expt_data["pressure"])
@@ -29,7 +29,7 @@ x_data.append(expt_data["volume_flowrate"])
 x_data = np.array(x_data)
 
 
-# %%
+
 # build y-data array
 y_data = []
 y_data.append(expt_data["output_CH3OH"])
@@ -37,7 +37,7 @@ y_data.append(expt_data["output_H2O"])
 y_data = np.array(y_data)
 y_data
 
-# %%
+
 #Provide the observed X values and Y values and uncertainties -- all should be arrays or lists with nesting like [[1,2,3]] or [[1,2,3,4],[4,5,6,6]]
 UserInput.responses['responses_abscissa'] = x_data
 UserInput.responses['responses_observed'] = y_data
@@ -46,7 +46,7 @@ UserInput.responses['responses_observed'] = y_data
 # UserInput.responses['responses_observed_uncertainties'] = observed_values_00.observed_data_y_values_uncertainties
 
 
-# %%
+
 ## initial values for As and Eas
 import math
 
@@ -80,7 +80,7 @@ param_log_unc_list = [val for val in param_log_unc.values()]
 
 param_name_dict = {key:key for key in param_prior_values.keys()}
 
-# %%
+
 #Optional: provide labels for the responses axes and parameter names.
 UserInput.simulated_response_plot_settings['x_label'] = ["pressure (Pa)", "mole frac CO", "mole frac CO2", "mole frac H2", "temperature (K)", "volume flowrate (m^3/s)"]
 UserInput.simulated_response_plot_settings['y_label'] = ["CH3OH TOF (1/s)", "H2O TOF (1/s)"]
@@ -136,16 +136,16 @@ if dillModuleExists == True:
     PE_object2 = PE_object2.load_from_dill("PE_object_00a0")
     PE_object2.createAllPlots()
 
-# %% [markdown]
+ [markdown]
 # # Misc functions for creating inputs for PEUQSE
 
-# %%
+
 listy1 = [1,2,3,4,5]
 listy2 = [7,8,9,10,11]
 
 np.vstack([listy1, listy2])
 
-# %%
+
 import os
 import shutil
 import sys
@@ -170,7 +170,7 @@ def change_model(path, A, Ea, rxn_num=0):
         yaml.dump(rms_mech, f)
 
 
-# %%
+
 
 A = 0.5
 Ea = 1
@@ -186,10 +186,10 @@ rms_mech = yaml.load(open(path, "r"), Loader=yaml.FullLoader)
 
 
 
-# %%
 
 
-# %%
+
+
 # take the most sensitive reactions and perturb their A's 
 import pickle
 sens_pickle = "/Users/blais.ch/Documents/_01_code/05_Project_repos_Github/meOH_repos/" + \
@@ -213,15 +213,15 @@ for key, value in sens_dict.items():
     most_sens_list[key] = [reac, prod]
 most_sens_list
 
-# %%
+
 for key, val in most_sens_list.items(): 
     print(len(val))
     val
 
-# %%
+
 type(rms_mech)
 
-# %%
+
 # get the rxn_num for each reaction in the 
 import copy
 most_sens_list_copy = copy.deepcopy(most_sens_list)
@@ -239,16 +239,16 @@ pert_rxns = [val[2] for val in most_sens_list_copy.values()]
 pert_rxns
 
 
-# %%
+
 for num in pert_rxns:
     print(rms_mech["Reactions"][num]["kinetics"], rms_mech["Reactions"][num]["reactants"], rms_mech["Reactions"][num]["products"])
 
-# %%
+
 expt_condts = "/Users/blais.ch/Documents/_01_code/05_Project_repos_Github/meOH_repos/uncertainty_analysis/rmg_gua/gua_cantera/all_experiments_reorg_sbr.yaml"
 with open(expt_condts, "r") as f:
     expt_list = yaml.load(f, Loader=yaml.FullLoader)
 
-# %%
+
 import math
 rtol = 0.1
 def compare_dicts(dict1, dict2):
@@ -310,17 +310,17 @@ new_expt_file = "./rms_model/small_expt.yaml"
 with open(new_expt_file, "w") as f:
     yaml.dump(new_expt_yaml, f)
 
-# %%
+
 match_exp = compare_dicts(expt_list[0], expt_list[0])
 match_exp
 
-# %%
+
 matches
 
-# %%
+
 expt_list[0]
 
-# %%
+
 
 
 
