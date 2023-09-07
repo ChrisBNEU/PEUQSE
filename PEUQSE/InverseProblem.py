@@ -1880,7 +1880,8 @@ class parameter_estimation:
                     self.post_burn_in_samples_unfiltered = copy.deepcopy(self.post_burn_in_samples)
                     self.post_burn_in_log_posteriors_un_normed_vec_unfiltered = copy.deepcopy(self.post_burn_in_log_posteriors_un_normed_vec)
                     self.post_burn_in_log_priors_vec_unfiltered = copy.deepcopy(self.post_burn_in_log_priors_vec)
-                except:
+                except Exception as e:
+                    print("error copying unfiltered post burn in samples (line 1878). exception:", str(e))
                     pass
             originalLength = np.shape(self.post_burn_in_log_posteriors_un_normed_vec)[0] 
             try:
@@ -1965,7 +1966,8 @@ class parameter_estimation:
                 np.savetxt(self.UserInput.directories['logs_and_csvs']+directory_name_suffix+file_name_prefix+'mcmc_unfiltered_post_burn_in_parameter_samples'+file_name_suffix+'.csv',self.post_burn_in_samples_unfiltered, delimiter=",")            
                 np.savetxt(self.UserInput.directories['logs_and_csvs']+directory_name_suffix+file_name_prefix+'mcmc_unfiltered_post_burn_in_log_priors_vec'+file_name_suffix+'.csv',self.post_burn_in_log_posteriors_un_normed_vec_unfiltered, delimiter=",")            
                 np.savetxt(self.UserInput.directories['logs_and_csvs']+directory_name_suffix+file_name_prefix+'mcmc_unfiltered_post_burn_in_log_posteriors_un_normed_vec'+file_name_suffix+'.csv',self.post_burn_in_log_priors_vec_unfiltered, delimiter=",")                        
-            except:
+            except Exception as e:
+                print("error saving unfiltered post burn in samples (line 1878). error text:", str(e))
                 pass
         with open(self.UserInput.directories['logs_and_csvs']+directory_name_suffix+file_name_prefix+'mcmc_log_file'+file_name_suffix+".txt", 'w') as out_file:
             out_file.write("self.initial_point_parameters:" + str( self.UserInput.InputParameterInitialGuess) + "\n")
@@ -2014,7 +2016,8 @@ class parameter_estimation:
                 np.savetxt(self.UserInput.directories['logs_and_csvs']+directory_name_suffix+file_name_prefix+'permutation_unfiltered_post_burn_in_parameter_samples'+file_name_suffix+'.csv',self.post_burn_in_samples_unfiltered, delimiter=",")            
                 np.savetxt(self.UserInput.directories['logs_and_csvs']+directory_name_suffix+file_name_prefix+'permutation_unfiltered_post_burn_in_log_priors_vec'+file_name_suffix+'.csv',self.post_burn_in_log_posteriors_un_normed_vec_unfiltered, delimiter=",")            
                 np.savetxt(self.UserInput.directories['logs_and_csvs']+directory_name_suffix+file_name_prefix+'permutation_unfiltered_post_burn_in_log_posteriors_un_normed_vec'+file_name_suffix+'.csv',self.post_burn_in_log_priors_vec_unfiltered, delimiter=",")                        
-            except:
+            except Exception as e:
+                print("error saving permutation samples (line 2013). error text:", str(e))
                 pass
         with open(self.UserInput.directories['logs_and_csvs']+directory_name_suffix+file_name_prefix+'permutation_log_file'+file_name_suffix+".txt", 'w') as out_file:
             out_file.write("self.initial_point_parameters:" + str( self.UserInput.InputParameterInitialGuess) + "\n")
