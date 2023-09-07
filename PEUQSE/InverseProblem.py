@@ -1651,6 +1651,13 @@ class parameter_estimation:
         #else continue as normal.
         log_likelihood_proposal, simulationOutput_proposal = self.getLogLikelihood(proposal_sample)
         logP = log_likelihood_proposal+log_prior_proposal #Of the Metropolis-Hastings accept/reject ratio
+
+        #adding our own data write for saving all output. may be useful for gsa
+        if self.UserInput.parameter_estimation_settings['exportAllSimulatedOutputs'] == True: 
+            if hasattr(self, "gsa_output") == False:
+                self.gsa_output = []
+            # save all the values needed for gsa
+            self.gsa_output.append([logP,proposal_sample,simulationOutput_proposal])
         return logP
         
     def getNegLogP(self, proposal_sample): #The proposal sample is specific parameter vector. We are using negative of log P because scipy optimize doesn't do maximizing. It's recommended minimize the negative in this situation.
@@ -1961,13 +1968,14 @@ class parameter_estimation:
         np.savetxt(self.UserInput.directories['logs_and_csvs']+directory_name_suffix+file_name_prefix+'mcmc_logP_and_parameter_samples'+file_name_suffix+'.csv',mcmc_samples_array, delimiter=",")
         pickleAnObject(mcmc_samples_array, self.UserInput.directories['pickles']+directory_name_suffix+file_name_prefix+'mcmc_logP_and_parameter_samples'+file_name_suffix)
         if self.UserInput.parameter_estimation_settings['exportAllSimulatedOutputs'] == True: #By default, we should not keep this, it's a little too large with large sampling.
+            pickleAnObject(self.gsa_output, self.UserInput.directories['pickles']+directory_name_suffix+file_name_prefix+'gsa_output'+file_name_suffix)
             try: #The main reason to use a try and except is because this feature has not been implemented for ESS. With ESS, the mcmc_unfiltered_post_burn_in_simulated_outputs would not be retained and the program would crash.
                 np.savetxt(self.UserInput.directories['logs_and_csvs']+directory_name_suffix+file_name_prefix+'mcmc_unfiltered_post_burn_in_simulated_outputs'+file_name_suffix+'.csv',self.post_burn_in_samples_simulatedOutputs, delimiter=",")         
                 np.savetxt(self.UserInput.directories['logs_and_csvs']+directory_name_suffix+file_name_prefix+'mcmc_unfiltered_post_burn_in_parameter_samples'+file_name_suffix+'.csv',self.post_burn_in_samples_unfiltered, delimiter=",")            
                 np.savetxt(self.UserInput.directories['logs_and_csvs']+directory_name_suffix+file_name_prefix+'mcmc_unfiltered_post_burn_in_log_priors_vec'+file_name_suffix+'.csv',self.post_burn_in_log_posteriors_un_normed_vec_unfiltered, delimiter=",")            
                 np.savetxt(self.UserInput.directories['logs_and_csvs']+directory_name_suffix+file_name_prefix+'mcmc_unfiltered_post_burn_in_log_posteriors_un_normed_vec'+file_name_suffix+'.csv',self.post_burn_in_log_priors_vec_unfiltered, delimiter=",")                        
             except Exception as e:
-                print("error saving unfiltered post burn in samples (line 1878). error text:", str(e))
+                print("error saving unfiltered post burn in samples (line 1963). error text:", str(e))
                 pass
         with open(self.UserInput.directories['logs_and_csvs']+directory_name_suffix+file_name_prefix+'mcmc_log_file'+file_name_suffix+".txt", 'w') as out_file:
             out_file.write("self.initial_point_parameters:" + str( self.UserInput.InputParameterInitialGuess) + "\n")
