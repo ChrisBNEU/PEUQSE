@@ -2508,43 +2508,51 @@ class parameter_estimation:
         
         # nchains is some multiple of 2 for ESS (ref the zeus paper). this will still take advantage of the 
         # N mpi runners you have. this will usually be 2 or 4
-        if self.UserInput.request_mpi == True:
+        if True:
             #maxiter=1E4 is the typical number, but we may want to increase it based on some UserInput variable.   
-            nchains = self.mcmc_nwalkers/numParameters
+            nchains = int(self.mcmc_nwalkers/numParameters)
+            print("number of chains: ", nchains)
             with ChainManager(nchains) as cm: 
+                print("chain started")
                 zeus_sampler = zeus.EnsembleSampler(
                     self.mcmc_nwalkers, numParameters, logprob_fn=self.getLogP, 
-                    maxiter=mcmc_maxiter, moves=movesTypeObject,pool=cm.get_pool,
+                    maxiter=mcmc_maxiter, moves=movesTypeObject, pool=cm.get_pool,verbose=True,
                     ) 
-                
-                zeus_sampler.run_mcmc(walkerStartPoints, nEnsembleSteps)
+                print("made sampler")
 
                 # figure out exception catching later. I am not sure it will be able to handle multiple 
                 # attepts to run the sampler. 
-                # for trialN in range(0,1000):#Todo: This number of this range is hardcoded but should probably be a user selection.
-                #     try:
-                        
-                #         break
-                #     except Exception as exceptionObject:
-                #         # This means there is an error message from zeus saying 
-                #         # " Invalid walker initial positions!  Initialise walkers 
-                #         # from positions of finite log probability."
-                #         if "finite" in str(exceptionObject): 
-                #             print("One of the starting points has a non-finite probability. Picking new starting points. If you see this message like an infinite loop, consider trying the doEnsembleSliceSampling optional argument of walkerInitialDistributionSpread. It has a default value of 1.0. Reducing this value to 0.25, for example, may work if your initial guess is near the maximum of the posterior distribution.")
-                #             #Need to make the sampler again, in this case, to throw away anything that has happened so far
-                #             walkerStartPoints = self.generateInitialPoints(initialPointsDistributionType=walkerInitialDistribution, numStartPoints = self.mcmc_nwalkers, relativeInitialDistributionSpread=walkerInitialDistributionSpread) 
-                #             zeus_sampler = zeus.EnsembleSampler(self.mcmc_nwalkers, numParameters, logprob_fn=self.getLogP, maxiter=mcmc_maxiter, moves=movesTypeObject,moves=movesTypeObject,pool=cm.get_pool) #maxiter=1E4 is the typical number, but we may want to increase it based on some UserInput variable.        
-                #             print("full zeus exception message: ", str(exceptionObject))
-                #         elif "maxiter" in str(exceptionObject): #This means there is an error message from zeus that the max iterations have been reached.
-                #             print("WARNING: One or more of the Ensemble Slice Sampling walkers encountered an error. The value of mcmc_maxiter is currently", mcmc_maxiter, "you should increase it, perhaps by a factor of 1E2.")
-                #         else:
-                #             print(str(exceptionObject))
-                #             sys.exit()
+                for trialN in range(0,1000):#Todo: This number of this range is hardcoded but should probably be a user selection.
+                    try:
+                        zeus_sampler.run_mcmc(walkerStartPoints, nEnsembleSteps)
+                        print("ran sampler")
+                        break
+                    except Exception as exceptionObject:
+                        # This means there is an error message from zeus saying 
+                        # " Invalid walker initial positions!  Initialise walkers 
+                        # from positions of finite log probability."
+                        print("full zeus exception message: ", str(exceptionObject))
+                        # if "finite" in str(exceptionObject): 
+                        #     print(str(exceptionObject))
+                        #     print("One of the starting points has a non-finite probability. Picking new starting points. If you see this message like an infinite loop, consider trying the doEnsembleSliceSampling optional argument of walkerInitialDistributionSpread. It has a default value of 1.0. Reducing this value to 0.25, for example, may work if your initial guess is near the maximum of the posterior distribution.")
+                        #     #Need to make the sampler again, in this case, to throw away anything that has happened so far
+                        #     walkerStartPoints = self.generateInitialPoints(initialPointsDistributionType=walkerInitialDistribution, numStartPoints = self.mcmc_nwalkers, relativeInitialDistributionSpread=walkerInitialDistributionSpread) 
+                        #     zeus_sampler = zeus.EnsembleSampler(
+                        #         self.mcmc_nwalkers, numParameters, 
+                        #         logprob_fn=self.getLogP, 
+                        #         maxiter=mcmc_maxiter, 
+                        #         moves=movesTypeObject,
+                        #         pool=cm.get_pool, verbose=True
+                        #         )      
+                        # elif "maxiter" in str(exceptionObject): #This means there is an error message from zeus that the max iterations have been reached.
+                        #     print("WARNING: One or more of the Ensemble Slice Sampling walkers encountered an error. The value of mcmc_maxiter is currently", mcmc_maxiter, "you should increase it, perhaps by a factor of 1E2.")
+                        # else:
+                        #     print(str(exceptionObject))
+                        #     sys.exit()
+                        sys.exit()
 
-                # TODO we will likely have a ton of .pyn files. need to combine them later (ashi has a function for this)
         # if not mpi run it ashi's way. 
         else:
-
             zeus_sampler = zeus.EnsembleSampler(
                 self.mcmc_nwalkers, numParameters, logprob_fn=self.getLogP, 
                 maxiter=mcmc_maxiter, moves=movesTypeObject
@@ -2558,7 +2566,7 @@ class parameter_estimation:
                         print("One of the starting points has a non-finite probability. Picking new starting points. If you see this message like an infinite loop, consider trying the doEnsembleSliceSampling optional argument of walkerInitialDistributionSpread. It has a default value of 1.0. Reducing this value to 0.25, for example, may work if your initial guess is near the maximum of the posterior distribution.")
                         #Need to make the sampler again, in this case, to throw away anything that has happened so far
                         walkerStartPoints = self.generateInitialPoints(initialPointsDistributionType=walkerInitialDistribution, numStartPoints = self.mcmc_nwalkers, relativeInitialDistributionSpread=walkerInitialDistributionSpread) 
-                        zeus_sampler = zeus.EnsembleSampler(self.mcmc_nwalkers, numParameters, logprob_fn=self.getLogP, maxiter=mcmc_maxiter, moves=movesTypeObject,moves=movesTypeObject) #maxiter=1E4 is the typical number, but we may want to increase it based on some UserInput variable.        
+                        zeus_sampler = zeus.EnsembleSampler(self.mcmc_nwalkers, numParameters, logprob_fn=self.getLogP, maxiter=mcmc_maxiter, moves=movesTypeObject) #maxiter=1E4 is the typical number, but we may want to increase it based on some UserInput variable.        
                         print("full zeus exception message: ", str(exceptionObject))
                     elif "maxiter" in str(exceptionObject): #This means there is an error message from zeus that the max iterations have been reached.
                         print("WARNING: One or more of the Ensemble Slice Sampling walkers encountered an error. The value of mcmc_maxiter is currently", mcmc_maxiter, "you should increase it, perhaps by a factor of 1E2.")
@@ -2569,8 +2577,17 @@ class parameter_estimation:
         adjusted_mcmc_burn_in_length = int(self.mcmc_burn_in_length / self.mcmc_nwalkers)
         self.post_burn_in_samples = zeus_sampler.samples.flatten(discard = adjusted_mcmc_burn_in_length )
         discrete_chains_post_burn_in_samples = zeus_sampler.get_chain(discard = adjusted_mcmc_burn_in_length)
+
+
+        # debug: save chain so we can verify that only one chain per mpi runner
+        from PEUQSE import parallel_processing
+        rank = parallel_processing.rank
+        print("burn in length: ", adjusted_mcmc_burn_in_length)
+        np.save(os.path.join(self.UserInput.directories['pickles'],'chain_'+str(rank)+'.npy'), discrete_chains_post_burn_in_samples)
+
         if self.UserInput.parameter_estimation_settings['mcmc_store_samplingObject'] == True:
             self.discrete_chains_post_burn_in_samples = discrete_chains_post_burn_in_samples
+        
         self.post_burn_in_log_posteriors_un_normed_vec = np.atleast_2d(zeus_sampler.samples.flatten_logprob(discard=adjusted_mcmc_burn_in_length)).transpose() #Needed to make it 2D and transpose.
         self.mcmc_last_point_sampled = discrete_chains_post_burn_in_samples[-1] #Note that for **zeus** the last point sampled is actually an array of points equal to the number of walkers.        
         # Populate the last_MCMC_run_type in UserInput so that there is a record of which MCMC run type was last used with this UserInput instance.
