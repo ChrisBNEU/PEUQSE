@@ -2509,7 +2509,8 @@ class parameter_estimation:
         # nchains is some multiple of 2 for ESS (ref the zeus paper). this will still take advantage of the 
         # N mpi runners you have. this will usually be 2 or 4
         if True:
-            #maxiter=1E4 is the typical number, but we may want to increase it based on some UserInput variable.   
+            #maxiter=1E4 is the typical number, but we may want to increase it based on some UserInput variable.
+            walkerStartPoints = np.array(self.UserInput.model['InputParameterPriorValues'], dtype='float')   
             nchains = int(self.mcmc_nwalkers/numParameters)
             print("number of chains: ", nchains)
             with ChainManager(nchains) as cm: 
