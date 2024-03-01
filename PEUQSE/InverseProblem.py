@@ -176,7 +176,7 @@ class parameter_estimation:
         elif len(np.shape(UserInput.InputParametersPriorValuesUncertainties)) > 1: #If it's non-1D, we assume it's already a covariance matrix.
             UserInput.covmat_prior = np.array(UserInput.InputParametersPriorValuesUncertainties, dtype='float')
             UserInput.var_prior = np.diagonal(UserInput.covmat_prior)
-            UserInput.std_prior = np.power(UserInput.covmat_prior,0.5)
+            UserInput.std_prior = np.power(np.abs(UserInput.covmat_prior),0.5)
         else: #If a blank list is received, that means the user
             print("The covariance matrix of the priors is undefined because InputParametersPriorValuesUncertainties is blank.")
         #    cov_prior = np.array([[200.0, 0., 0., 0., 0., 0.], 
